@@ -1,0 +1,69 @@
+services:
+  astrbot:
+    build: .
+    container_name: astrbot
+    restart: always
+    ports:
+      - "6185:6185"   # AstrBot WebUI
+      - "6199:6199"   # QQ WebSocket (羽书)
+      - "6200:6200"   # QQ WebSocket (白真真)
+      - "9876:9876"   # Wave Memory WebUI
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./data:/AstrBot/data
+      - ../graphrag_novels:/AstrBot/graphrag_novels:ro
+      - ../docs/novel:/AstrBot/novel_docs:ro
+    networks:
+      - astrbot_net
+    depends_on:
+      - astrbot-t2i
+
+  napcat:
+    image: mlikiowa/napcat-docker:latest
+    container_name: napcat-astrbot
+    restart: always
+    ports:
+      - "6098:6099"   # NapCat WebUI (羽书)
+    environment:
+      - NAPCAT_UID=0
+      - NAPCAT_GID=0
+      - NAPCAT_QUICK_ACCOUNT=2500447291
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./napcat/config:/app/napcat/config
+      - ./napcat/QQ:/app/.config/QQ
+    networks:
+      - astrbot_net
+
+  napcat-baizz:
+    image: mlikiowa/napcat-docker:latest
+    container_name: napcat-baizz
+    restart: always
+    ports:
+      - "6097:6099"   # NapCat WebUI (白真真)
+    environment:
+      - NAPCAT_UID=0
+      - NAPCAT_GID=0
+      - NAPCAT_QUICK_ACCOUNT=1336495069
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./napcat-baizz/config:/app/napcat/config
+      - ./napcat-baizz/QQ:/app/.config/QQ
+    networks:
+      - astrbot_net
+
+  astrbot-t2i:
+    image: soulter/astrbot-t2i-service:latest
+    container_name: astrbot-t2i
+    restart: always
+    environment:
+      - TZ=Asia/Shanghai
+      - PORT=8999
+      - IMAGE_LIFETIME_HOURS=24
+    networks:
+      - astrbot_net
+
+networks:
+  astrbot_net:
+    driver: bridge

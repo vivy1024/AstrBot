@@ -64,3 +64,17 @@ GenieData/
 .worktrees/
 
 dashboard/bun.lock
+
+# Local deployment
+napcat/
+napcat-baizz/
+*.log
+*.png
+*.mp3
+tmp_*
+cmd_config_*.json
+!cmd_config.json
+debug_response.txt
+persona_raw.txt
+recent_memories*.md
+
